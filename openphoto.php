@@ -1,17 +1,16 @@
-#!/usr/bin/php
 <?php
-$consumerKey = getenv('consumerKey');
-$consumerSecret = getenv('consumerSecret');
-$token = getenv('token');
-$tokenSecret = getenv('tokenSecret');
+#$consumerKey = getenv('consumerKey');
+#$consumerSecret = getenv('consumerSecret');
+#$token = getenv('token');
+#$tokenSecret = getenv('tokenSecret');
 
-$arguments = getopt('F:X:h:e:pvs', array('encode::'));
+//$arguments = getopt('F:X:h:e:pvs', array('encode::'));
 $host = 'localhost';
 $useSSL = false;
 
+/*
 if(isset($arguments['h']))
   $host = $arguments['h'];
-$method = 'get';
 if(isset($arguments['X']))
   $method = strtolower($arguments['X']);
 $endpoint = '/photos/pageSize-3/list.json';
@@ -28,7 +27,60 @@ if(isset($arguments['s']))
 $encode = false;
 if(isset($arguments['encode']))
   $encode = true;
+*/
 
+//get data from url
+//$host=$_SERVER['HTTP_HOST'];
+
+
+//set the address of server
+$host='ec2-54-85-195-87.compute-1.amazonaws.com';
+#echo $host."\n";
+$operation=$_GET['operation'];
+#echo $operation."<br />";
+$ID=$_GET['ID'];
+#$path=$_GET['path'];
+#echo is_uploaded_file($_FILES['file']['tmp_name']);
+#move_uploaded_file($_FILES['file']['tmp_name'], "/home/ubuntu/test/test.jpg");
+$path=$_FILES['file']['tmp_name'];
+#$path="/home/ubuntu/test/test.jpg";
+$tags=$_GET['tags'];
+if ($operation == 'upload'){
+        $consumerKey = $_GET['consumerKey'];
+        $consumerSecret = $_GET['consumerSecret'];
+        $token = $_GET['token'];
+        $tokenSecret = $_GET['tokenSecret'];
+}
+#print_r ($_FILES);
+
+if($operation=='hello')
+    {
+        $endpoint='/hello.json';
+        $method = 'get';
+    }
+if($operation=='view')
+    {
+        $method = 'get';
+        $endpoint="/photo/$ID/$operation.json";
+    }   
+if($operation=='upload')
+    {
+        $method = 'post';
+        #$useSSL = true;
+        $endpoint='/photo/upload.json';
+        $fields = array();
+        if(isset($path))
+            {
+                $fields['photo']='@' . $path;
+                $fields['tags']=$tags;
+                $fields['auth']='true';
+            } 
+    }
+#print_r ($fields);
+#echo $endpoint."\n";
+
+/*
+$encode = false;
 $fields = array();
 if(isset($arguments['F']))
 {
@@ -41,6 +93,11 @@ if(isset($arguments['F']))
       $fields[$parts[0]] = $parts[1];
   }
 }
+*/
+
+#$endpoint = "/photo/upload.json";
+#$fields = array('photo' => '@' . $path, 'tags' => $tags, 'auth' => 'true');
+
 
 include 'OpenPhotoOAuth.php';
 $client = new OpenPhotoOAuth($host, $consumerKey, $consumerSecret, $token, $tokenSecret);
@@ -50,9 +107,11 @@ if($method == 'get')
 elseif($method == 'post')
   $resp = $client->post($endpoint, $fields);
 
+$verbose=true;
 if($verbose)
-  echo sprintf("==========\nMethod: %s\nHost: %s\nEndpoint: %s\nSSL: %s\n==========\n\n", $method, $host, $endpoint, $useSSL ? 'Yes' : 'No');
+  #echo sprintf("==========\nMethod: %s\nHost: %s\nEndpoint: %s\nSSL: %s\n==========\n\n", $method, $host, $endpoint, $useSSL ? 'Yes' : 'No');
 
+$pretty = true;
 if($pretty)
   echo indent($resp);
 else
