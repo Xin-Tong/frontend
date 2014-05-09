@@ -34,7 +34,7 @@ if(isset($arguments['encode']))
 
 
 //set the address of server
-$host='ec2-54-85-195-87.compute-1.amazonaws.com';
+$host='54.85.111.90';
 #echo $host."\n";
 $operation=$_GET['operation'];
 #echo $operation."<br />";
